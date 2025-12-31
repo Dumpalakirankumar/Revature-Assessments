@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student Management</title>
+  <style>
+    table { border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid black; padding: 6px; }
+    .fail { color: red; }
+  </style>
+</head>
+<body>
+
+<h2>Add Student</h2>
+Name: <input type="text" id="name">
+Marks: <input type="number" id="marks">
+Department: <input type="text" id="dept">
+<button onclick="addStudent()">Add</button>
+
+<hr>
+
+<h3>All Student Names</h3>
+<ul id="allNames"></ul>
+
+<h3>Marks > 60</h3>
+<ul id="above60"></ul>
+
+<h3>Count by Department</h3>
+<ul id="deptCount"></ul>
+
+<h3>Highest Marks</h3>
+<p id="topper"></p>
+
+<h3>Student Table</h3>
+<table>
+  <thead>
+    <tr><th>Name</th><th>Marks</th><th>Department</th></tr>
+  </thead>
+  <tbody id="tableBody"></tbody>
+</table>
+
+<h3>Average Marks</h3>
+<p id="average"></p>
+
+<h3>CSE Students</h3>
+<ul id="cseList"></ul>
+
+<h3>Sorted by Marks</h3>
+<ul id="sortedList"></ul>
+
+<h3>Failed Students</h3>
+<ul id="failedList"></ul>
+
+<script>
+let students = [];
+
+function addStudent() {
+  const name = document.getElementById("name").value;
+  const marks = Number(document.getElementById("marks").value);
+  const dept = document.getElementById("dept").value;
+
+  students.push({ name, marks, department: dept });
+
+  document.getElementById("name").value = "";
+  document.getElementById("marks").value = "";
+  document.getElementById("dept").value = "";
+
+  displayAll();
+}
+
+function displayAll() {
+  allNames.innerHTML = "";
+  above60.innerHTML = "";
+  deptCount.innerHTML = "";
+  tableBody.innerHTML = "";
+  cseList.innerHTML = "";
+  sortedList.innerHTML = "";
+  failedList.innerHTML = "";
+
+  students.forEach(s => allNames.innerHTML += `<li>${s.name}</li>`);
+
+  students.filter(s => s.marks > 60)
+    .forEach(s => above60.innerHTML += `<li>${s.name}</li>`);
+
+  const count = {};
+  students.forEach(s => count[s.department] = (count[s.department] || 0) + 1);
+  for (let d in count) {
+    deptCount.innerHTML += `<li>${d}: ${count[d]}</li>`;
+  }
+
+  if (students.length > 0) {
+    let top = students[0];
+    students.forEach(s => { if (s.marks > top.marks) top = s; });
+    topper.textContent = top.name + " - " + top.marks;
+  }
+
+  students.forEach(s => {
+    tableBody.innerHTML += `
+      <tr>
+        <td>${s.name}</td>
+        <td>${s.marks}</td>
+        <td>${s.department}</td>
+      </tr>`;
+  });
+
+  let sum = 0;
+  students.forEach(s => sum += s.marks);
+  average.textContent = students.length ? sum / students.length : 0;
+
+  students.filter(s => s.department === "CSE")
+    .forEach(s => cseList.innerHTML += `<li>${s.name}</li>`);
+
+  [...students].sort((a,b) => b.marks - a.marks)
+    .forEach(s => sortedList.innerHTML += `<li>${s.name} - ${s.marks}</li>`);
+
+  students.filter(s => s.marks < 50)
+    .forEach(s => failedList.innerHTML += `<li class="fail">${s.name}</li>`);
+}
+</script>
+
+</body>
+</html>
